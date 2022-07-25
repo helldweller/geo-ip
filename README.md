@@ -1,4 +1,4 @@
-# geo-ip
+# geo-ip (in development)
 Http/grpc API to convert IP addresses from Maxmind database to countries or cities
 
 ## Setup for development
