@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -51,6 +52,8 @@ func Run() {
 		}
 		return nil
 	})
+
+	http.Handle("/metrics", promhttp.Handler())
 
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 

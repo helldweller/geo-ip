@@ -31,8 +31,28 @@ spec:
         - name: app
           image: geo-ip
           resources: {}
+          ports:
+            - name: main
+              containerPort: 80
           env:
             - name: LOG_LEVEL
               value: info
             - name: HTTP_LISTEN
               value: ":80"
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: geo-ip
+  labels:
+    release: prometheus # release name of prom-stack chart
+spec:
+  selector:
+    matchLabels:
+      app: geo-ip
+  podMetricsEndpoints:
+    - port: main
+      interval: 30s
+      path: /metrics
+      targetPort: 80
