@@ -1,43 +1,8 @@
 # geo-ip (in development)
+
 Http/grpc API to convert IP addresses from Maxmind database to countries or cities
 
-## Setup
-
-### You need for development
-
-* A kubernetes cluster (or minikube or docker desktop k8s)
-* kubectl with kubeconfig to that cluster
-* helm3
-* skaffold
-
-Commands for dev env
-
-    # start
-    skaffold dev
-
-    # cleanup
-    skaffold delete
-
-## Maxmind database using
-
-This https://hub.docker.com/r/maxmindinc/geoipupdate image is used here.
-
-### Secrets
-
-You must register a maxmind account and get account id and key for using in variables:
-
-    GEOIPUPDATE_ACCOUNT_ID
-    GEOIPUPDATE_LICENSE_KEY
-
-And put to the secrets ./skaffold/secrets.yaml, see example ./skaffold/secrets-example.yaml
-
-### Get last-modified database (for debug)
-
-    curl -I 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=<KEY>&suffix=tar.gz'
-    # or
-    docker run --rm -it -e GEOIPUPDATE_LICENSE_KEY=<KEY> -e GEOIPUPDATE_ACCOUNT_ID=<ID> -e GEOIPUPDATE_EDITION_IDS=GeoLite2-City -v "C:\maxmind:/usr/share/GeoIP" maxmindinc/geoipupdate:latest
-
-## REST
+## REST Api
 
 3 endpoints are available:
 
@@ -52,7 +17,43 @@ Also system endpoints:
     /healthcheck/liveness  - liveness probe
     /healthcheck/readiness - readiness probe
 
-## Metrics (if u want to visualisate)
+## Setup
+
+### You need for development
+
+* A kubernetes cluster (or minikube or docker desktop k8s)
+* kubectl with kubeconfig to that cluster
+* helm3
+* skaffold
+
+First you need to add secrets.
+
+You must register a maxmind account and get account id and key for using in variables:
+
+    GEOIPUPDATE_ACCOUNT_ID
+    GEOIPUPDATE_LICENSE_KEY
+
+And put to the secrets ./skaffold/secrets.yaml, see example ./skaffold/secrets-example.yaml
+
+Commands for dev env
+
+    # start
+    skaffold dev
+
+    # cleanup
+    skaffold delete
+
+## Maxmind database using
+
+This https://hub.docker.com/r/maxmindinc/geoipupdate image is used here.
+
+### Get last-modified database (for debug)
+
+    curl -I 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=<KEY>&suffix=tar.gz'
+    # or
+    docker run --rm -it -e GEOIPUPDATE_LICENSE_KEY=<KEY> -e GEOIPUPDATE_ACCOUNT_ID=<ID> -e GEOIPUPDATE_EDITION_IDS=GeoLite2-City -v "C:\maxmind:/usr/share/GeoIP" maxmindinc/geoipupdate:latest
+
+## Metrics (if you want to visualize)
 
     helm repo add prometheus https://prometheus-community.github.io/helm-charts
     helm repo update
