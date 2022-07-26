@@ -14,19 +14,49 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: geo-ip
 spec:
   replicas: 1
+  serviceName: geo-ip
   selector:
     matchLabels:
       app: geo-ip
+  volumeClaimTemplates:
+    - metadata:
+        name: geo-db
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 128Mi
   template:
     metadata:
       labels:
         app: geo-ip
     spec:
+      initContainers:
+        - name: geo-update
+          image: maxmindinc/geoipupdate:latest
+          resources: {}
+          env:
+            - name: GEOIPUPDATE_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: geo-update
+                  key: GEOIPUPDATE_ACCOUNT_ID
+            - name: GEOIPUPDATE_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: geo-update
+                  key: GEOIPUPDATE_LICENSE_KEY
+            - name: GEOIPUPDATE_EDITION_IDS
+              value: GeoLite2-City
+          volumeMounts:
+            - mountPath: /usr/share/GeoIP
+              name: geo-db
       containers:
         - name: app
           image: geo-ip
@@ -39,6 +69,9 @@ spec:
               value: info
             - name: HTTP_LISTEN
               value: ":80"
+          volumeMounts:
+            - mountPath: /usr/share/GeoIP
+              name: geo-db
 
 ---
 apiVersion: monitoring.coreos.com/v1
